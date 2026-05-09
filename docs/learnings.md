@@ -86,6 +86,23 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-09 — `make test` is one script and a graveyard  `#cursed` `#agentic`
+
+**What happened:** Ran `make test` in `~/cursed/` to see what the
+project considers "passing." It builds the compiler and runs
+`test_suite/compiler_subset/test_compiler_subset.sh` — five fixtures,
+one positive, four asserting rejection. That's it. Meanwhile
+`test_suite/` itself contains hundreds of `.💀`/`.ll` files and dozens
+of `final_results.log`/`complete_results.log`/`fresh_results.txt`
+files. None of it is wired into the default test target.
+
+**Why it's interesting:** A first `ls test_suite/` reads like a
+thriving suite. It's actually one passing sentinel plus a graveyard
+of abandoned attempts — and the file names (`final_*`, `complete_*`,
+`latest_*`) suggest the abandonment happened more than once. For an
+agent looking for evidence of what works, the loose files are
+actively misleading: they look like tests but assert nothing.
+
 ### 2026-05-09 — the implemented subset is a lot smaller than the surface  `#cursed` `#agentic`
 
 **What happened:** Before writing the first red test, I checked what

@@ -36,7 +36,9 @@ def test_case_count_floor() -> None:
 
 
 def test_update_goldens_disabled_in_ci() -> None:
-    if os.environ.get("CI") != "1":
+    # GitHub Actions, GitLab, CircleCI, Travis all set CI=true; Jenkins
+    # sometimes uses CI=1; treat any non-empty value as "in CI."
+    if not os.environ.get("CI"):
         pytest.skip("only enforced in CI")
     assert os.environ.get("BRAT_UPDATE_GOLDENS") != "1", (
         "BRAT_UPDATE_GOLDENS=1 must not be set in CI"

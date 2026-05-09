@@ -70,10 +70,21 @@ def _apply_modes(case_dir: Path) -> list[Path]:
     Reads `<case_dir>/modes` if present, with one `filename:octal` line per
     file under inputs/. Returns the list of paths whose modes were changed
     so the caller can restore them.
+
+    Skips the case if the suite is running as root: every existing modes
+    entry today is a chmod intended to *deny* access (e.g. 0o000 for the
+    EACCES bratism), and root bypasses DAC, so the case cannot exercise
+    the path it claims to. Common in Docker/CI containers that run as
+    root.
     """
     modes_file = case_dir / "modes"
     if not modes_file.exists():
         return []
+    if os.geteuid() == 0:
+        pytest.skip(
+            f"case {case_dir.name} uses chmod-based access denial which is "
+            "ineffective under root; run as a non-root user"
+        )
     applied: list[Path] = []
     for line in modes_file.read_text().strip().splitlines():
         fname, octal = line.split(":", 1)

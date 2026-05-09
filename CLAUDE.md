@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`brat` is a `cat`-style file printer written in **CURSED** (Geoffrey Huntley's gen-z-slang esoteric language). Single source file `brat.💀`, compiled to a native binary via `cursed-compiler`. The aesthetic is brat-album-coded: lime `#8ACE00` block headers, lowercase bratism error messages, no flags.
+`brat` is a `cat`-style file printer written in **CURSED** (Geoffrey Huntley's gen-z-slang esoteric language). Single source file `brat.💀`, compiled to a native binary via `cursed-compiler`.
+
+The aesthetic is **gen-z-coded**, matching CURSED itself: lowercase, terse, slang-inflected. Charli XCX's *brat* (lime `#8ACE00` block headers, lowercase bratism error messages, no flags) is the most visible reference — and CURSED's own site leans on the same album theming — but it's not the only register. Any gen-z-flavoured idiom is in scope; "bestie", "no thoughts", "it's giving" etc. are as on-brand as direct *brat* references. Don't constrain yourself to Charli XCX quotes when picking copy.
 
 ## CURSED is half-built — check what actually works first
 

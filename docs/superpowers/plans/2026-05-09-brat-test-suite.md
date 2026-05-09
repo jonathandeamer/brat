@@ -20,7 +20,7 @@ Files this plan creates or modifies:
 
 | Path | Role |
 |---|---|
-| `pyproject.toml` (modify) | Add `[project.optional-dependencies] test = ["pytest>=8"]` |
+| `requirements-test.txt` (create) | Pin `pytest>=8` for contributor install |
 | `.gitignore` (create) | Ignore `__pycache__/`, `.pytest_cache/`, `*.pyc` |
 | `tests/__init__.py` (create) | Empty; lets `tests._lib...` import |
 | `tests/_lib/__init__.py` (create) | Empty |
@@ -41,31 +41,22 @@ Each file has one responsibility. The harness, the spec encoding (header builder
 ### Task 1: Add pytest dependency
 
 **Files:**
-- Modify: `pyproject.toml`
+- Create: `requirements-test.txt`
 - Create: `.gitignore`
 
-- [ ] **Step 1: Extend `pyproject.toml`**
+**Design note:** `pyproject.toml` is intentionally *not* modified. The repo is not a Python package — `brat` itself is a CURSED binary, and `pyproject.toml` exists only to hold the `[tool.commitizen]` config that tracks the project's version. Adding a `[project]` table with `name = "brat-tests"` would mislabel the repo and create a second source of truth alongside commitizen's `version` field. Pytest is installed standalone from a plain `requirements-test.txt`.
 
-Replace the file contents with:
+- [ ] **Step 1: Create `requirements-test.txt`**
 
-```toml
-[tool.commitizen]
-name = "cz_conventional_commits"
-version = "0.1.0"
-tag_format = "v$version"
-update_changelog_on_bump = true
+Contents (single line):
 
-[project]
-name = "brat-tests"
-version = "0.1.0"
-description = "Test harness for brat (the binary itself is in CURSED)"
-requires-python = ">=3.10"
-
-[project.optional-dependencies]
-test = ["pytest>=8"]
+```
+pytest>=8
 ```
 
 - [ ] **Step 2: Create `.gitignore`**
+
+Contents:
 
 ```
 __pycache__/
@@ -73,21 +64,22 @@ __pycache__/
 *.pyc
 ```
 
-- [ ] **Step 3: Install the test extra**
+- [ ] **Step 3: Install pytest**
 
-Run: `uv pip install -e ".[test]"` (fall back to `pip install -e ".[test]"` if uv is unavailable).
-Expected: install succeeds; `python -m pytest --version` reports 8.x.
+Run: `uv pip install --system -r requirements-test.txt`
+Fall back to `pip install -r requirements-test.txt` if uv is unavailable.
+If `--system` is rejected (e.g., a managed Python), fall back to `uv tool install pytest` — that route also makes `python -m pytest` resolvable in this project's environment because `uv tool` shims appear on `PATH`.
 
-- [ ] **Step 4: Confirm pytest is importable from the project venv**
+- [ ] **Step 4: Confirm pytest is importable**
 
 Run: `python -m pytest --version`
-Expected: prints `pytest 8.x.y`. (Do not pass `tests/` here — the directory does not exist yet on a fresh checkout, which would surface as pytest's usage error 4 and look like a real failure.)
+Expected: prints `pytest 8.x.y`. (Do not pass `tests/` — the directory does not exist yet on a fresh checkout, which would surface as pytest's usage error 4 and look like a real failure.)
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add pyproject.toml .gitignore
-git commit -m "build: add pytest as optional test dependency"
+git add requirements-test.txt .gitignore
+git commit -m "build: add pytest test dependency via requirements-test.txt"
 ```
 
 ---

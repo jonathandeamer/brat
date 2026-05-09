@@ -19,6 +19,7 @@ Most of CURSED's documentation, examples, and reference material is **aspiration
 - **Red-green TDD.** Write the failing test first, watch it fail for the right reason, then implement. The discipline is load-bearing here because CURSED's compiler errors are sparse and misleading — a green test is your main signal that the feature works.
 - **Specs and plans are point-in-time snapshots.** `docs/superpowers/specs/` and `docs/superpowers/plans/` capture intent at the moment they were written. If implementation diverges, you do **not** need to retroactively update them unless the divergence is materially important to future readers (e.g. a contract other code depends on). Routine drift is fine.
 - **Update `docs/learnings.md` when you're surprised.** The doc has its own "When to update" section — read it. The short version: CURSED limitations, hallucinated syntax, tooling gaps, quotable user remarks. Not for routine green tests or normal commits.
+- **Avoid AI-writing tropes in `learnings.md`.** Read `~/tropes/tropes.md` before writing entries. The biggest offender for this doc is **"this changes everything" grandiosity** — small surprises don't "fundamentally reshape" anything; they're just notes. Also watch for `delve`, `tapestry`, `landscape`, `serves as`, magic adverbs (`quietly`, `deeply`), and the urge to inflate a one-paragraph observation into a thesis. Concrete and small beats sweeping every time.
 
 ## Commands
 

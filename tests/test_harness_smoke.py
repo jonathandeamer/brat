@@ -55,6 +55,7 @@ def test_nul_bytes_survive_capture(tmp_path: Path) -> None:
     fake = _write_script(tmp_path, "nul.py", NUL_SCRIPT)
     result = subprocess.run(
         [sys.executable, str(fake)],
+        cwd=str(tmp_path),
         capture_output=True,
         check=False,
     )
@@ -66,6 +67,7 @@ def test_no_trailing_newline_strip(tmp_path: Path) -> None:
     fake = _write_script(tmp_path, "nl.py", NEWLINE_SCRIPT)
     result = subprocess.run(
         [sys.executable, str(fake)],
+        cwd=str(tmp_path),
         capture_output=True,
         check=False,
     )

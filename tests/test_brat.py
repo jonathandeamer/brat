@@ -21,10 +21,17 @@ def _discover_cases() -> list[Path]:
 
 
 def _load_args(case_dir: Path) -> list[str]:
+    """Parse the case's args file: one argument per line, trailing newline ignored.
+
+    Empty file -> []. Blank lines mid-file are rejected: an empty-string argument
+    is almost certainly a case-author bug, not an intentional invocation.
+    """
     text = (case_dir / "args").read_text()
     parts = text.split("\n")
     if parts and parts[-1] == "":
         parts = parts[:-1]
+    if any(a == "" for a in parts):
+        raise ValueError(f"args file in {case_dir} contains a blank line")
     return parts
 
 

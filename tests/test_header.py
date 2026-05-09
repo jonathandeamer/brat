@@ -3,6 +3,8 @@ from tests._lib.header import block_header, LIME_BG, BLACK_FG, RESET
 
 
 def test_ansi_constants():
+    # Spec pin: surfaces an explicit failure if anyone changes the ANSI bytes
+    # in addendum §1 / parent §4 without also updating the goldens.
     assert LIME_BG == b"\x1b[48;2;138;206;0m"
     assert BLACK_FG == b"\x1b[30m"
     assert RESET == b"\x1b[0m"

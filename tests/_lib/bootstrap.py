@@ -1,7 +1,10 @@
 """One-off script that populates tests/cases/<case>/ for the 12 spec cases.
 
 Re-run with `python3 -m tests._lib.bootstrap` to overwrite goldens after a
-spec change. Once brat exists, prefer `BRAT_UPDATE_GOLDENS=1 pytest`.
+spec change. Once brat exists, `BRAT_UPDATE_GOLDENS=1 pytest` is the
+authoritative regen path; running this bootstrap at that point would
+overwrite brat-verified goldens with spec-derived ones and should only
+be done when the spec itself has changed.
 """
 from __future__ import annotations
 

@@ -84,7 +84,7 @@ The parent spec proposes a pure-shell harness (`tests/run.sh`). This addendum su
 
 ### Tooling
 
-- `pytest` is the only required test dependency. Declare it in `pyproject.toml` under `[project.optional-dependencies] test = ["pytest"]`.
+- `pytest` is the only required test dependency. **Superseded by the test-suite plan:** declared in a top-level `requirements-test.txt`, not `pyproject.toml`. Adding a `[project]` table with `name = "brat-tests"` would mislabel the repo (brat itself is a CURSED binary, not a Python package) and create a second source of truth alongside `[tool.commitizen].version`. See plan Task 1 design note.
 - No `syrupy` / `pytest-snapshot`. Their snapshot storage formats fight binary goldens with NUL bytes and ANSI escapes; plain files on disk plus `Path.read_bytes()` is cleaner.
 - No `pytest-xdist`. Twelve cases, no parallelization benefit.
 

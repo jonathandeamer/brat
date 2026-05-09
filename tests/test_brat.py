@@ -13,6 +13,35 @@ import pytest
 
 CASES_DIR = Path(__file__).resolve().parent / "cases"
 
+# Ratchet: bump when intentionally adding cases. Catches silent deletions.
+MIN_CASES = 18
+
+REQUIRED_CASE_ENTRIES = ("args", "expected.out", "expected.err", "expected.exit", "inputs")
+
+
+def test_every_case_has_required_files() -> None:
+    cases = _discover_cases()
+    missing: list[str] = []
+    for case_dir in cases:
+        for entry in REQUIRED_CASE_ENTRIES:
+            if not (case_dir / entry).exists():
+                missing.append(f"{case_dir.name}/{entry}")
+    assert not missing, f"incomplete cases: {missing}"
+
+
+def test_case_count_floor() -> None:
+    assert len(_discover_cases()) >= MIN_CASES, (
+        f"fewer than {MIN_CASES} cases discovered; bump MIN_CASES intentionally if removing"
+    )
+
+
+def test_update_goldens_disabled_in_ci() -> None:
+    if os.environ.get("CI") != "1":
+        pytest.skip("only enforced in CI")
+    assert os.environ.get("BRAT_UPDATE_GOLDENS") != "1", (
+        "BRAT_UPDATE_GOLDENS=1 must not be set in CI"
+    )
+
 
 def _discover_cases() -> list[Path]:
     if not CASES_DIR.exists():
@@ -63,6 +92,7 @@ def test_case(case_dir: Path, brat_bin: Path) -> None:
     args = _load_args(case_dir)
     inputs_dir = case_dir / "inputs"
 
+    before = sorted(os.listdir(inputs_dir))
     chmodded = _apply_modes(case_dir)
     try:
         result = subprocess.run(
@@ -74,6 +104,8 @@ def test_case(case_dir: Path, brat_bin: Path) -> None:
     finally:
         for target in chmodded:
             target.chmod(0o644)
+    after = sorted(os.listdir(inputs_dir))
+    assert before == after, f"brat mutated inputs/ in case {case_dir.name}: {before} -> {after}"
 
     actual_out = result.stdout
     actual_err = result.stderr
@@ -95,6 +127,10 @@ def test_case(case_dir: Path, brat_bin: Path) -> None:
     assert actual_err == expected_err_path.read_bytes(), (
         f"stderr mismatch for case {case_dir.name}"
     )
-    assert actual_exit == int(expected_exit_path.read_text().strip()), (
+    expected_exit = int(expected_exit_path.read_text().strip())
+    assert 0 <= expected_exit < 256, (
+        f"expected.exit in {case_dir.name} out of range: {expected_exit}"
+    )
+    assert actual_exit == expected_exit, (
         f"exit code mismatch for case {case_dir.name}"
     )

@@ -166,5 +166,13 @@ The full parent §7 table after this addendum:
 | 10 | Directory as arg | empty | `<filename> is a directory fam\n` | 1 |
 | 11 | No args | empty | `bestie you have to give me a file\n` | 1 |
 | 12 | `good, missing, good` (3 args) | two header+body sections in argv order | one bratism `\n`-terminated | 1 |
+| 13 | File exists but is unreadable (EACCES) | empty | `<filename> said no\n` | 1 |
+| 14 | Two missing files plus one good file (3 args) | one header+body for the good file | two bratisms, in argv order, each `\n`-terminated | 1 |
+| 15 | `-` as filename (parent §2 forbids stdin support) | empty | `-? never heard of her\n` | 1 |
+| 16 | Filename containing a space | header + body verbatim | empty | 0 |
+| 17 | Path with a directory component (e.g. `sub/x.txt`) | header + body verbatim | empty | 0 |
+| 18 | 46-char filename (`len+4 == 50` exactly) | header at width 50, pad 0 | empty | 0 |
 
 Each case gets `expected.out`, `expected.err`, `expected.exit` goldens under `tests/cases/<case>/`. The `.exit` file is a one-line integer.
+
+**Per-file mode handling (case 13).** Case 13 (EACCES) requires the input file to be mode `0o000`. Git tracks only the executable bit, not arbitrary modes, so the chmod cannot be persisted in the case directory itself. The bootstrap script writes a `<case>/modes` file containing `filename:octal` lines; the walker reads it before running brat, applies the chmods, and restores `0o644` in a `finally` block. The mechanism is general but is currently used only by case 13. **Caveat:** mode `0o000` denies access only for non-root users; tests must not be run as root.

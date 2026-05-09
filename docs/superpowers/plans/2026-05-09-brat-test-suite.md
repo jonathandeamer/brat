@@ -68,11 +68,11 @@ __pycache__/
 
 Run: `uv pip install --system -r requirements-test.txt`
 Fall back to `pip install -r requirements-test.txt` if uv is unavailable.
-If `--system` is rejected (e.g., a managed Python), fall back to `uv tool install pytest` — that route also makes `python -m pytest` resolvable in this project's environment because `uv tool` shims appear on `PATH`.
+If `--system` is rejected (e.g., a managed Python), fall back to `uv tool install pytest` — that route also makes `python3 -m pytest` resolvable in this project's environment because `uv tool` shims appear on `PATH`.
 
 - [ ] **Step 4: Confirm pytest is importable**
 
-Run: `python -m pytest --version`
+Run: `python3 -m pytest --version`
 Expected: prints `pytest 8.x.y`. (Do not pass `tests/` — the directory does not exist yet on a fresh checkout, which would surface as pytest's usage error 4 and look like a real failure.)
 
 - [ ] **Step 5: Commit**
@@ -140,7 +140,7 @@ def test_long_filename_grows_block_with_no_trailing_pad():
 
 - [ ] **Step 3: Run, verify failure**
 
-Run: `python -m pytest tests/test_header.py -v`
+Run: `python3 -m pytest tests/test_header.py -v`
 Expected: collection error or ImportError on `tests._lib.header`.
 
 - [ ] **Step 4: Implement the helper**
@@ -175,7 +175,7 @@ def block_header(filename: str) -> bytes:
 
 - [ ] **Step 5: Run, verify pass**
 
-Run: `python -m pytest tests/test_header.py -v`
+Run: `python3 -m pytest tests/test_header.py -v`
 Expected: 4 passed.
 
 - [ ] **Step 6: Commit**
@@ -231,7 +231,7 @@ def brat_bin() -> Path:
 
 - [ ] **Step 2: Confirm header tests still pass**
 
-Run: `python -m pytest tests/test_header.py -v`
+Run: `python3 -m pytest tests/test_header.py -v`
 Expected: 4 passed (header tests don't request `brat_bin`, so the fixture is never instantiated).
 
 - [ ] **Step 3: Commit**
@@ -256,7 +256,7 @@ Create `tests/_lib/bootstrap.py`:
 ```python
 """One-off script that populates tests/cases/<case>/ for the 12 spec cases.
 
-Re-run with `python -m tests._lib.bootstrap` to overwrite goldens after a
+Re-run with `python3 -m tests._lib.bootstrap` to overwrite goldens after a
 spec change. Once brat exists, prefer `BRAT_UPDATE_GOLDENS=1 pytest`.
 """
 from __future__ import annotations
@@ -440,7 +440,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 2: Run the bootstrap**
 
-Run: `python -m tests._lib.bootstrap`
+Run: `python3 -m tests._lib.bootstrap`
 Expected: no stdout; exit 0.
 
 - [ ] **Step 3: Spot-check generated goldens**
@@ -551,7 +551,7 @@ def test_case(case_dir: Path, brat_bin: Path) -> None:
 
 - [ ] **Step 2: Run; observe the red state**
 
-Run: `python -m pytest tests/test_brat.py -v`
+Run: `python3 -m pytest tests/test_brat.py -v`
 Expected: 12 ERRORS (one per case), all with the message starting `"brat binary not found at <path>. Build brat first..."`. No PASS, no FAIL — pytest reports fixture failures as errors, not failures.
 
 - [ ] **Step 3: Commit**
@@ -649,7 +649,7 @@ def test_no_trailing_newline_strip(tmp_path: Path) -> None:
 
 - [ ] **Step 2: Run; verify pass**
 
-Run: `python -m pytest tests/test_harness_smoke.py -v`
+Run: `python3 -m pytest tests/test_harness_smoke.py -v`
 Expected: 3 passed.
 
 - [ ] **Step 3: Commit**
@@ -667,7 +667,7 @@ git commit -m "test: harness smoke test independent of brat binary"
 
 - [ ] **Step 1: Run the full suite**
 
-Run: `python -m pytest tests/ -v`
+Run: `python3 -m pytest tests/ -v`
 Expected:
 - `tests/test_header.py`: 4 passed.
 - `tests/test_harness_smoke.py`: 3 passed.
@@ -676,7 +676,7 @@ Expected:
 
 - [ ] **Step 2: Confirm `BRAT_UPDATE_GOLDENS` does not bypass the fixture**
 
-Run: `BRAT_UPDATE_GOLDENS=1 python -m pytest 'tests/test_brat.py::test_case[empty]' -v`
+Run: `BRAT_UPDATE_GOLDENS=1 python3 -m pytest 'tests/test_brat.py::test_case[empty]' -v`
 Expected: 1 ERROR on `brat_bin` (same message). The regen branch sits *after* the subprocess call, so a missing brat still fails the fixture.
 
 - [ ] **Step 3: Document the red state in the commit log (no new commit needed)**

@@ -86,6 +86,41 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-09 — the implemented subset is a lot smaller than the surface  `#cursed` `#agentic`
+
+**What happened:** Before writing the first red test, I checked what
+CURSED actually compiles today. `~/cursed/` ships hundreds of `.💀`
+examples (crypto, async, channels, generics, HTTP/2), a tree-sitter
+grammar, vscode/intellij/vim plugins, a webapp, a package registry.
+The `--compile` path accepts: one `slay main_character()` entry
+point, `vibez.spill`, and four `stringz` functions. No conditionals,
+no argv, no stderr, no exit-code control, no file I/O. Three
+independent confirmations: the script in
+`test_suite/compiler_subset/test_compiler_subset.sh` asserts the
+compiler *rejects* `if`-equivalents, user functions, member access,
+arrays, and non-`vibez`/`stringz` imports; my own probe of
+`ready x > 0 { vibez.spill("yes") }` failed with
+`error.MissingMainCharacter`; `cursed_runtime.c` (the only C file
+linked into compiled programs) defines exactly `spill_string`,
+`spill_int`, `spill_float`, `spill_bool`, all to stdout via
+`printf`.
+
+**Why it's interesting:** The project ships the artifacts of a
+mature language ecosystem ahead of the runtime that backs them. For
+an agent this is a hallucination trap: grep finds plenty of `.💀`
+files using features that don't compile, and "I saw an example doing
+X" is not evidence X works. The useful filter is
+`current_llvm_subset.md` AND `cursed_runtime.c` — the real surface
+is whatever those two agree on. Concretely, this kills the
+no-args case as a first red test: producing different behavior for
+"args" vs "no args" needs both argv and a conditional, neither of
+which exists.
+
+**Quote-worthy bit:** user, on the HN reception: "so why all the
+fuss online that this is an entire new language?" The honest answer
+is that the language is real and the implementation is one `printf`
+and four string ops.
+
 ### 2026-05-09 — bratism as error-message constraint  `#cursed`
 
 **What happened:** The error message for "no files given" is

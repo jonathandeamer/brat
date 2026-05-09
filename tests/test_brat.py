@@ -35,6 +35,25 @@ def _load_args(case_dir: Path) -> list[str]:
     return parts
 
 
+def _apply_modes(case_dir: Path) -> list[Path]:
+    """Apply the case's optional modes file before the test runs.
+
+    Reads `<case_dir>/modes` if present, with one `filename:octal` line per
+    file under inputs/. Returns the list of paths whose modes were changed
+    so the caller can restore them.
+    """
+    modes_file = case_dir / "modes"
+    if not modes_file.exists():
+        return []
+    applied: list[Path] = []
+    for line in modes_file.read_text().strip().splitlines():
+        fname, octal = line.split(":", 1)
+        target = case_dir / "inputs" / fname.strip()
+        target.chmod(int(octal.strip(), 8))
+        applied.append(target)
+    return applied
+
+
 @pytest.mark.parametrize(
     "case_dir",
     _discover_cases(),
@@ -44,12 +63,17 @@ def test_case(case_dir: Path, brat_bin: Path) -> None:
     args = _load_args(case_dir)
     inputs_dir = case_dir / "inputs"
 
-    result = subprocess.run(
-        [str(brat_bin), *args],
-        cwd=str(inputs_dir),
-        capture_output=True,
-        check=False,
-    )
+    chmodded = _apply_modes(case_dir)
+    try:
+        result = subprocess.run(
+            [str(brat_bin), *args],
+            cwd=str(inputs_dir),
+            capture_output=True,
+            check=False,
+        )
+    finally:
+        for target in chmodded:
+            target.chmod(0o644)
 
     actual_out = result.stdout
     actual_err = result.stderr

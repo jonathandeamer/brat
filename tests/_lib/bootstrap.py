@@ -24,16 +24,30 @@ def write_case(
     expected_out: bytes,
     expected_err: bytes,
     expected_exit: int,
+    modes: dict[str, int] | None = None,
 ) -> None:
+    """Populate tests/cases/<name>/.
+
+    inputs keys may contain `/` to nest under inputs/ (parent dirs are created).
+    modes is an optional mapping of input filename -> octal mode applied at
+    test time by the walker (and restored to 0o644 after). Used for cases that
+    need a chmod the filesystem cannot carry through git (e.g., 0o000 for
+    EACCES tests).
+    """
     case_dir = CASES_DIR / name
     if case_dir.exists():
         shutil.rmtree(case_dir)
     (case_dir / "inputs").mkdir(parents=True)
     (case_dir / "args").write_text("\n".join(args) + ("\n" if args else ""))
     for fname, content in inputs.items():
-        (case_dir / "inputs" / fname).write_bytes(content)
+        target = case_dir / "inputs" / fname
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
     for d in subdirs:
         (case_dir / "inputs" / d).mkdir()
+    if modes:
+        lines = [f"{fname}:{mode:03o}" for fname, mode in modes.items()]
+        (case_dir / "modes").write_text("\n".join(lines) + "\n")
     (case_dir / "expected.out").write_bytes(expected_out)
     (case_dir / "expected.err").write_bytes(expected_err)
     (case_dir / "expected.exit").write_text(f"{expected_exit}\n")
@@ -178,6 +192,80 @@ def main() -> None:
         ),
         expected_err=b"missing.txt? never heard of her\n",
         expected_exit=1,
+    )
+
+    # 13: EACCES — file exists but is not readable
+    # Note: chmod 0o000 only denies non-root. Tests run as ec2-user.
+    write_case(
+        "permission-denied",
+        args=["noaccess.txt"],
+        inputs={"noaccess.txt": b"secret\n"},
+        subdirs=[],
+        modes={"noaccess.txt": 0o000},
+        expected_out=b"",
+        expected_err=b"noaccess.txt said no\n",
+        expected_exit=1,
+    )
+
+    # 14: multiple errors in one run
+    write_case(
+        "multi-missing",
+        args=["missing1.txt", "missing2.txt", "good.txt"],
+        inputs={"good.txt": b"good\n"},
+        subdirs=[],
+        expected_out=block_header("good.txt") + b"good\n",
+        expected_err=(
+            b"missing1.txt? never heard of her\n"
+            b"missing2.txt? never heard of her\n"
+        ),
+        expected_exit=1,
+    )
+
+    # 15: dash as filename — pins parent §2 "no stdin support, no '-' filename"
+    write_case(
+        "dash-filename",
+        args=["-"],
+        inputs={},
+        subdirs=[],
+        expected_out=b"",
+        expected_err=b"-? never heard of her\n",
+        expected_exit=1,
+    )
+
+    # 16: filename containing spaces — argv must round-trip unmangled
+    write_case(
+        "spaced-filename",
+        args=["my file.txt"],
+        inputs={"my file.txt": b"hello\n"},
+        subdirs=[],
+        expected_out=block_header("my file.txt") + b"hello\n",
+        expected_err=b"",
+        expected_exit=0,
+    )
+
+    # 17: path with a directory component (already-lowercase to avoid the
+    # unspecified mixed-case-path question)
+    write_case(
+        "subdir-path",
+        args=["sub/x.txt"],
+        inputs={"sub/x.txt": b"nested\n"},
+        subdirs=[],
+        expected_out=block_header("sub/x.txt") + b"nested\n",
+        expected_err=b"",
+        expected_exit=0,
+    )
+
+    # 18: 46-char filename — boundary where len+4 == 50 exactly (pad=0,
+    # width=50, no block growth). Just shy of the long-name (47-char) case.
+    boundary_name = "x" * 46
+    write_case(
+        "boundary-46",
+        args=[boundary_name],
+        inputs={boundary_name: b"boundary\n"},
+        subdirs=[],
+        expected_out=block_header(boundary_name) + b"boundary\n",
+        expected_err=b"",
+        expected_exit=0,
     )
 
 

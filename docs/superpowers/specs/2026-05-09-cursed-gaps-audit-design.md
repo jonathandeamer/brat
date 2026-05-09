@@ -28,14 +28,17 @@ primitive, plus a mapping table.
 
 **Need:** what brat needs this for, in one sentence.
 **Status:** missing | partial | broken.
+**Design status:** spec'd | undesigned. Cite the relevant `~/cursed/specs/*.md`
+section if spec'd; say "no documented surface" if not.
 **Evidence:** runtime-C citation, subset-doc quote, or probe output
 (verbatim, fenced).
 **Brat cases blocked:** list of `tests/cases/<name>` dirs.
 **Upstream framing:** one-line issue title + the minimal surface that
-would unblock brat.
+would unblock brat. Phrase differently for spec'd vs undesigned: "implement
+already-spec'd X" reads very differently from "design and implement Y."
 ```
 
-`Status` values:
+`Status` values (implementation state, per `current_llvm_subset.md`):
 
 - `missing` — no implementation at all (e.g. no stderr write in
   `cursed_runtime.c`).
@@ -45,6 +48,11 @@ would unblock brat.
   diagnostic (e.g. `ready` in current subset emits
   `error.MissingMainCharacter` instead of an "unsupported construct"
   diagnostic).
+
+`Design status` is orthogonal: a gap can be `missing` + `spec'd` (the
+common case — designed but not implemented) or `missing` + `undesigned`
+(no documented surface at all, e.g. argv access). The distinction matters
+for upstream framing.
 
 ### Mapping table
 
@@ -72,16 +80,35 @@ brainstorming session, citing `cursed_runtime.c` and
 - array literals / indexing — integration script asserts rejection.
 
 These get `Status: missing` and `Evidence:` lines pointing at the file
-and line range.
+and line range. For each, also check `~/cursed/specs/` (notably
+`error_handling.md`, `stdlib/`, `grammar.md`, `types.md`) and set
+`Design status: spec'd` with a section citation if the primitive is
+designed, or `undesigned` if not.
+
+Corroborating evidence from `~/cursed/test_suite/compiler_subset/` is
+welcome where it applies: the lone positive fixture (`supported_cli.💀`)
+pins exactly which primitives are exercised by `make test`, and the four
+`unsupported_*.💀` fixtures pin exactly which constructs are asserted to
+be rejected. Cite the fixture filename when relevant.
+
+Do **not** cite the wider `~/cursed/test_suite/` directory — the loose
+`.💀`/`.ll`/`*_results.log` dump is not wired into `make test` and
+represents abandoned attempts, not working behavior. It's misleading as
+evidence of either implementation or design intent.
 
 ### 2. Probe (parser/validator-layer gaps)
 
 For language-layer gaps where the parser or validator decides — and where
-the failure mode itself is interesting — write a minimal `.💀` probe in
-`/tmp/`, run it through `~/cursed/zig-out/bin/cursed-compiler --compile`,
-and paste the verbatim diagnostic into the gap's `Evidence:` block.
+the failure mode itself is interesting — write a minimal `.💀` probe under
+`experiments/probes/`, named to match the gap section
+(`experiments/probes/conditionals.💀`, `experiments/probes/argv-access.💀`,
+etc.). Run it through `~/cursed/zig-out/bin/cursed-compiler --compile` and
+paste the verbatim diagnostic into the gap's `Evidence:` block, alongside a
+`see experiments/probes/<name>.💀` pointer.
 
-Probes are ephemeral. Do not commit them.
+Commit the probes. They're tiny, but the captured paste alone is lossy —
+having the exact source lets a future reader re-run to check for diagnostic
+drift (see Risks).
 
 Known probes needed at start of step:
 
@@ -142,7 +169,8 @@ right granularity.
 
 Two commits, in order:
 
-1. `docs(gaps): seed cursed-gaps roadmap` — adds `docs/cursed-gaps.md`.
+1. `docs(gaps): seed cursed-gaps roadmap` — adds `docs/cursed-gaps.md`
+   and the probes under `experiments/probes/`.
 2. `docs(learnings): cursed-gaps audit summary` — adds the learnings
    entry.
 
@@ -152,7 +180,9 @@ Two invariants must hold when the audit is done. Self-check inline; no
 automation.
 
 1. Every gap section has at least one citation in `Evidence:` — either a
-   file/line reference or fenced probe output.
+   file/line reference or fenced probe output — and a `Design status:`
+   line that's either `spec'd` with a `~/cursed/specs/*.md` citation or
+   explicitly `undesigned`.
 2. Every directory in `tests/cases/` appears as a row in the
    `Cases ↔ Gaps` table, with at least one gap or `implementable today`.
 

@@ -78,10 +78,10 @@ __pycache__/
 Run: `uv pip install -e ".[test]"` (fall back to `pip install -e ".[test]"` if uv is unavailable).
 Expected: install succeeds; `python -m pytest --version` reports 8.x.
 
-- [ ] **Step 4: Confirm pytest discovers no tests yet**
+- [ ] **Step 4: Confirm pytest is importable from the project venv**
 
-Run: `python -m pytest tests/ -q`
-Expected: collection prints "no tests ran in <time>". A non-zero exit (5 = no tests collected) is acceptable here.
+Run: `python -m pytest --version`
+Expected: prints `pytest 8.x.y`. (Do not pass `tests/` here — the directory does not exist yet on a fresh checkout, which would surface as pytest's usage error 4 and look like a real failure.)
 
 - [ ] **Step 5: Commit**
 

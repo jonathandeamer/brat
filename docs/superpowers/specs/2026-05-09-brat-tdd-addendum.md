@@ -76,7 +76,7 @@ Consequences:
 
 - Every `expected.err` golden ends in exactly one `\n` byte.
 - Adding a new bratism to the catalog requires no per-string newline discipline; the print primitive enforces termination.
-- The `io.ewrite` primitive (no termination) is reserved for the block-header rows, where each `\n` is written explicitly.
+- The `io.write` primitive (stdout, no termination) carries the block-header rows, where each `\n` is written explicitly. The `io.ewrite` primitive (stderr, no termination) is available if a future bratism needs to skip the implicit `\n` from `io.eprintln`; today, every bratism goes through `io.eprintln`.
 
 ## 7. Test harness: pytest, not shell (supersedes parent §7)
 

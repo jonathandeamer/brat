@@ -5,7 +5,7 @@
 
 ## 1. Overview
 
-`brat` is a `cat`-style file printer, written in pure CURSED, with a brat-album-coded aesthetic. It reads files by name, prints each one with a lime-green block header, and emits Charli-cadence error messages on failure.
+`brat` is a `cat`-style file printer, written in pure CURSED, with a brat-album-coded aesthetic. It reads files by name, prints each one with a lime-green block header, and emits lowercase bratism error messages on failure.
 
 The pitch is the combination, not any single layer:
 
@@ -19,7 +19,7 @@ The pitch is the combination, not any single layer:
 ### In scope (v1.0)
 
 - `brat file1 file2 ...` reads each file and prints its contents to stdout, preceded by a lime-green block header showing the (lowercased) filename
-- Charli-cadence lowercase error messages to stderr
+- Lowercase bratism error messages to stderr
 - Continue-don't-abort error semantics: a missing file logs an error; the next file still gets printed
 - Native binary built from a single `.💀` source via `cursed-compiler`
 - Source distribution + pre-built binaries for Linux x64 and macOS arm64
@@ -48,7 +48,7 @@ main():
     for filename in args:
         (contents, errno) = fs.read_file(filename)  # PR-1
         if errno != 0:
-            io.eprintln(charli_message_for(errno, filename))
+            io.eprintln(brat_message_for(errno, filename))
             exit_code = 1
             continue
         print_block_header(filename)
@@ -61,7 +61,7 @@ main():
 Helpers:
 
 - `print_block_header(name tea)` — assembles the three-line lime block header and writes via `io.write` (raw bytes, with explicit `\n` after each header line). Lowercases the name before printing.
-- `charli_message_for(errno normie, filename tea) tea` — maps a `read_file` errno to one of the canonical Charli phrases. Used by the error path.
+- `brat_message_for(errno normie, filename tea) tea` — maps a `read_file` errno to one of the canonical bratisms. Used by the error path.
 
 There is no flag-parsing function; argv minus arg 0 is the filename list.
 
@@ -124,7 +124,7 @@ Files are emitted back-to-back with no blank-line separator — the block header
 
 When `fs.read_file` returns a non-empty error string:
 
-1. Write the Charli error message to stderr (or stdout in fallback).
+1. Write the bratism to stderr (or stdout in fallback).
 2. Set `exit_code = 1`.
 3. **Do not** emit a partial block header for the failed file.
 4. Continue to the next file.
@@ -135,7 +135,10 @@ brat does not detect TTY. ANSI escapes are emitted unconditionally. Users who pi
 
 ## 5. Error handling
 
-### Charli-cadence string catalog
+### Bratism catalog
+
+A *bratism* is brat's signature error voice: lowercase, terse, vocative, gen-z internet vernacular. The catalog below enumerates the canonical strings.
+
 
 | Trigger | Message |
 |---|---|
@@ -149,7 +152,7 @@ brat does not detect TTY. ANSI escapes are emitted unconditionally. Users who pi
 
 ### Mapping rules
 
-`fs.read_file` returns an integer `errno` on failure (see PR-1 in Section 6). `charli_message_for(errno, filename)` matches on the errno value, using POSIX-standard codes:
+`fs.read_file` returns an integer `errno` on failure (see PR-1 in Section 6). `brat_message_for(errno, filename)` matches on the errno value, using POSIX-standard codes:
 
 - `errno == 2` (ENOENT) → `<filename>? never heard of her`
 - `errno == 13` (EACCES) → `<filename> said no`
@@ -285,7 +288,7 @@ Test cases (each gets `.out`, `.err`, `.exit` goldens):
 | Directory as arg | empty | `<filename> is a directory fam` | 1 |
 | No args | empty | `bestie you have to give me a file` | 1 |
 
-This catches all the failure-path requirements directly: stderr-channel correctness (PR-4), exit-code correctness (PR-3), and Charli-string mapping (Section 5). In fallback modes (PRs not landed), the corresponding tests will fail intentionally — that's how we know which fallbacks are active.
+This catches all the failure-path requirements directly: stderr-channel correctness (PR-4), exit-code correctness (PR-3), and bratism mapping (Section 5). In fallback modes (PRs not landed), the corresponding tests will fail intentionally — that's how we know which fallbacks are active.
 
 Golden outputs are committed as binary-clean files containing exact ANSI escape bytes. Regenerate intentionally via `make regenerate-golden`.
 

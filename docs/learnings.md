@@ -86,6 +86,38 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-10 — a sibling-repo loop left fingerprints in my audit  `#agentic` `#cursed`
+
+**What happened:** The local-only commits that anchored the
+original brat audit (`specs/current_llvm_subset.md`,
+`test_suite/compiler_subset/`, `src-zig/supported_subset.zig`)
+were authored 2026-04-11 17:26 UTC during a Huntley-loop attempt
+at *snarkdown* — an earlier project that tried to port Markdown
+to CURSED. Per
+`~/old-quackdown-shakedown-etc/docs/project-history.md`, that loop
+discovered CURSED was pre-alpha (no stdin, no file I/O, no
+conditionals, no loops) and pivoted to DuckDB the same day.
+Before pivoting, it went into the `~/cursed/` checkout, cloned
+30 minutes earlier, and committed three files documenting and
+gating CURSED's working surface. The commits never got pushed.
+
+A month later (this brat session) I read those three files as
+upstream sources of truth and anchored every gap section against
+them. The directional conclusions held, but the failure-mode
+evidence reflected the local validator's clean
+`UnsupportedConstruct` rejections, not the silent miscompiles
+upstream actually produces. The audit took two re-runs to
+converge against clean upstream.
+
+**Why it's interesting:** An autonomous loop in one project can
+leave residue in a shared dependency that a later, less-
+autonomous session in a different project unknowingly reads as
+ambient truth. Nothing in this repo's git history mentioned
+snarkdown, and the local `~/cursed/` files looked indistinguish-
+able from upstream documentation. Worth a check before treating
+a sibling repo's specs as authoritative: `git log @{u}.. <file>`
+or `git diff @{u}` to see if the file is local-only.
+
 ### 2026-05-10 — the gated picture wasn't the upstream picture  `#cursed` `#agentic`
 
 **What happened:** The original cursed-gaps audit ran against a

@@ -94,6 +94,33 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-10 — commit examples became policy by accident  `#agentic`
+
+**What happened:** Claude and Codex produced a mix of commit subjects
+like `docs: ...`, `docs(plans): ...`, and `docs(specs): ...` while
+working across brat and cursed. Both repos already had Commitizen
+hooks, so it looked like consistency should be enforced. The actual
+hook was only:
+
+```sh
+cz check --commit-msg-file "$1"
+```
+
+That validates the Conventional Commits grammar but accepts arbitrary
+scopes. `docs(plans): update plan`, `docs(anything): update docs`,
+and `docs: update docs` all passed. The agents were following nearby
+examples and old plan commits because no deterministic rule said which
+scopes were allowed.
+
+**Why it's interesting:** Agent instructions are not the same as
+repo policy. If a repo has examples of a pattern, agents will tend to
+reuse it even when the human preference has shifted. The useful fix
+was small and mechanical: keep Commitizen for grammar, then add a
+short scope allowlist in `commit-msg`, with CLAUDE.md explaining that
+unscoped commits are preferred.
+
+**Quote-worthy bit:** `docs(plans): update plan -> fail`
+
 ### 2026-05-10 — the loop symlinked a fake home into my real one  `#agentic`
 
 **What happened:** The remote history for

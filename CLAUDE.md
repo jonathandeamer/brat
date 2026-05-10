@@ -43,8 +43,9 @@ tracking docs in the same session:
 - `README.md` — public-facing project status or reviewer entry points.
 - `UPSTREAM.md` — CURSED issues, PRs, links, status, and which brat gap
   they address.
-- `docs/cursed-subset.md` — verified current behavior of
-  `cursed-compiler --compile`; upstream has no published equivalent.
+- `docs/cursed-subset.md` — brat-local verified behavior of
+  `cursed-compiler --compile`; upstream publishes compiler binaries,
+  but not an equivalent brat-focused subset matrix.
 - `docs/cursed-gaps.md` — brat blockers, failure modes, blocked cases,
   and upstream framing.
 - `docs/learnings.md` — durable surprises only, using the tag guidance

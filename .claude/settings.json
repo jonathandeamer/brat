@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pytest)",
+      "Bash(pytest tests/*)",
+      "Bash(pytest -k *)",
+      "Bash(pytest -v)",
+      "Bash(BRAT_UPDATE_GOLDENS=1 pytest tests/test_brat.py)",
+      "Bash(./brat *)",
+      "Bash(bash experiments/verify_cursed_gaps.sh)",
+      "Bash(cz check *)",
+      "Bash(git fetch upstream)",
+      "Bash(xxd -p *)",
+      "Bash(cursed-compiler *)"
+    ]
+  }
+}

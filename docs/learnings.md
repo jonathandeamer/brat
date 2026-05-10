@@ -86,6 +86,34 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-09 — read the runtime, missed the IR  `#agentic` `#cursed`
+
+**What happened:** During the cursed-gaps audit I claimed `vibez.spill`
+does *not* append `\n`, contradicting the brat-design spec. The
+evidence I cited was real: `cursed_runtime_spill_string` in
+`~/cursed/src-zig/cursed_runtime.c:7-11` is plain `printf("%s", str)`
+with no newline. I committed a "correction" to the design spec
+(`f9e5813`) on the strength of it.
+
+Then I ran a two-line program: `vibez.spill("A"); vibez.spill("B")`
+and `xxd`'d the output. `41 0a 42 0a` — `A\nB\n`. Reading the emitted
+LLVM IR, the compiler injects a second
+`cursed_runtime_spill_string(@newline_str)` call after every user
+spill. The runtime function never appends a newline; the compiler
+sandwiches one in via a separate call. The spec was right.
+
+**Why it's interesting:** Runtime semantics live across two layers.
+Reading only the runtime C file gave a confident, half-true answer.
+A compile-and-run probe of three lines would have caught it in
+seconds. The audit's other probes were all compile-time gates
+(rejected/accepted) where running the binary tells you nothing extra,
+so I generalised the wrong shape: capture-the-diagnostic worked for
+nine probes and silently failed for the tenth. For runtime
+semantics — what `vibez.spill` *prints*, not whether it compiles —
+the right probe is the binary's stdout.
+
+**Quote-worthy bit:** I would have caught this with `xxd`.
+
 ### 2026-05-09 — cursed-gaps audit  `#cursed` `#contributing`
 
 **What happened:** Walked all 18 brat test cases and mapped each to

@@ -1,0 +1,8 @@
+vibe main
+yeet "vibez"
+
+slay main_character() {
+    vibez.spill("BEFORE")
+    vibez.spill(argv)
+    vibez.spill("AFTER")
+}

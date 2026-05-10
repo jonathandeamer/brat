@@ -28,7 +28,7 @@ Each gap has:
 **Need:** brat writes its `cat:` error messages to stderr.
 **Status:** missing.
 **Design status:** spec'd at the stdlib-design level but absent from the implemented subset — `~/cursed/specs/stdlib/main_character.md:125` documents an `ErrorVibe = NewVibeFile(uintptr(syscall.Stderr), "/dev/stderr")` handle and `~/cursed/specs/stdlib/dropz.md:172` mentions a `stderr Writer`, but `~/cursed/specs/current_llvm_subset.md:25-35` lists only `vibez.spill` and four `stringz` calls in the implemented stdlib slice.
-**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — only `cursed_runtime_spill_string/_int/_float/_bool` exist, all writing via `printf`/`fflush(stdout)`. No `fprintf`, no `stderr`, no write-to-fd-2 path anywhere in the runtime.
+**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — only `cursed_runtime_spill_string/_int/_float/_bool` exist, all writing via `printf`/`fflush(stdout)`. No `fprintf`, no `stderr`, no write-to-fd-2 path anywhere in the runtime. Confirmed by execution: a baseline program (`vibez.spill("hi")`) compiled and run as `./prog 2>err.txt 1>out.txt` yields zero bytes on stderr — no IR-level injection writes to fd 2 either, so the runtime read isn't hiding a compiler-side path.
 **Brat cases blocked:** dash-filename, directory, good-missing-good, missing, multi-missing, no-args, permission-denied.
 **Upstream framing:** "runtime: add stderr write surface" — minimum: a `vibez.spill_err(s)` (or equivalent) that maps to `fprintf(stderr, ...)`.
 
@@ -37,7 +37,7 @@ Each gap has:
 **Need:** brat must exit non-zero when any file fails to read, so `cat`-style pipelines can detect failure.
 **Status:** missing.
 **Design status:** spec'd at the stdlib-design level — `~/cursed/specs/stdlib/main_character.md:89` documents `slay VibeOut(code normie)` ("Exits with status code (like os.Exit)") — but absent from the implemented subset (`~/cursed/specs/current_llvm_subset.md:25-35`). `~/cursed/specs/error_handling.md` does not document a process-exit primitive at all.
-**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — no `exit(`, `_exit`, or `abort` symbol referenced; the runtime exposes only the four `spill_*` print helpers, so the exit code of any compiled program is whatever `main` returns by default.
+**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — no `exit(`, `_exit`, or `abort` symbol referenced; the runtime exposes only the four `spill_*` print helpers, so the exit code of any compiled program is whatever `main` returns by default. Confirmed by execution: the baseline program above exits 0; the existing `experiments/probes/argv-access.💀` binary also exits 0 despite the compile-time "Variable argv not found" warning. Across success and induced-error paths, `$?` is always 0.
 **Brat cases blocked:** dash-filename, directory, good-missing-good, missing, multi-missing, no-args, permission-denied.
 **Upstream framing:** "runtime: expose process exit primitive" — minimum: a `vibe_life.exit(code normie)` (or `os.exit`) that maps to libc `exit(int)`.
 
@@ -46,7 +46,7 @@ Each gap has:
 **Need:** brat must read the bytes of each file named on the command line.
 **Status:** missing.
 **Design status:** spec'd at the stdlib-design level — `~/cursed/specs/stdlib/dropz.md:59-99` documents `slay read_file(filename tea) ([]byte, tea)`, `read_text_file`, `open`, `open_file`, and `(f *File) read` — but absent from the implemented subset (`~/cursed/specs/current_llvm_subset.md:25-35`).
-**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — no `fopen`, `fread`, `read`, or `open` symbol; the runtime is entirely `printf`-shaped output helpers. No file-read entry point exists for the compiler to lower a `dropz` call against.
+**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — no `fopen`, `fread`, `read`, or `open` symbol; the runtime is entirely `printf`-shaped output helpers. No file-read entry point exists for the compiler to lower a `dropz` call against. Confirmed by probe: every `dropz`-import shape (`dropz.read_file`, `dropz.open`, `dropz.Read`, `fs.read_file`, `io.read_all`) is rejected at the *import* with ``unsupported import `dropz`; only `vibez` and `stringz` are supported in LLVM compile mode``. A bare `read_file(...)` call (no import) is rejected as ``user-defined function calls are unsupported``. There is no surface that reaches a file-read at all.
 **Brat cases blocked:** all 18 cases except no-args (no-args never opens a file).
 **Upstream framing:** "runtime+stdlib: implement `dropz.read_file`" — minimum: a `dropz.read_file(path tea) ([]byte, tea)` that maps to libc `fopen`/`fread`/`fclose` and surfaces errno-shaped errors.
 
@@ -135,6 +135,8 @@ The diagnostic is a misleading proxy: the program plainly has `slay main_charact
 ```
 
 The diagnostic itself is unhelpful — the compiler doesn't reject `argv`, it just warns "Variable argv not found, returning 0" and produces a binary that ignores process arguments. This is evidence that no argv surface exists rather than evidence of an error message about argv specifically.
+
+Runtime confirmation: `vibez.spill("BEFORE"); vibez.spill(argv); vibez.spill("AFTER")` compiled and run as `./prog one two three` prints `BEFORE\n0\nAFTER\n` regardless of arguments. The emitted IR shows `argv` lowered to `call void @cursed_runtime_spill_int(i64 0)` — the silent default is *typed* as integer 0, not an empty string or null. Worse than missing: any brat-shaped program that reads `argv` will silently substitute `0` and produce nonsense, with no compile-time or run-time error.
 
 **Brat cases blocked:** all 18 cases (every brat case is parameterised by the filename(s) on the command line; no-args is the case that argv-length-zero must distinguish from the rest).
 **Upstream framing:** "language: design and implement argv access surface" — minimum: a way to read argv as an iterable or indexable sequence of strings inside `main_character()`. Naming, shape (slice vs. iterator), and length-discovery primitive all need to be designed.

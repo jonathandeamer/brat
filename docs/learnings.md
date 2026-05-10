@@ -86,6 +86,34 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-09 — the compiler is quiet in three hostile ways  `#cursed` `#agentic`
+
+**What happened:** Three failure modes surfaced during the gaps
+audit, all sharing a shape: the compiler degrades silently instead
+of erroring.
+
+1. **Compile errors exit 0.** The `ready` probe printed
+   `error: MissingMainCharacter` and `$?` was 0. CI scripts that
+   gate on exit code would pass a broken build.
+2. **Undefined identifiers compile to `i64 0`.** `vibez.spill(argv)`
+   lowered to `cursed_runtime_spill_int(i64 0)` and ran clean. The
+   "Variable argv not found, returning 0" message is a debug
+   stderr line, not an error.
+3. **`MissingMainCharacter` is a catch-all.** Any unsupported
+   construct in a function body — `ready`, `bestie`, etc. — drops
+   that function from the validator's set, then the entry-point
+   check fails with this same diagnostic. The diagnostic doesn't
+   name the offending construct.
+
+**Why it's interesting:** Future probes that "look fine" need a
+second look. A clean exit, a successful compile, or a diagnostic
+that mentions an unrelated thing aren't reliable negative signals.
+The runtime-execution rule from the prior entry catches case 2;
+cases 1 and 3 want script-level paranoia (`grep -i error` on
+combined stdout+stderr, not just `$?`).
+
+**Quote-worthy bit:** "Variable argv not found, returning 0."
+
 ### 2026-05-09 — read the runtime, missed the IR  `#agentic` `#cursed`
 
 **What happened:** During the cursed-gaps audit I claimed `vibez.spill`

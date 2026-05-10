@@ -86,6 +86,27 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-09 — a second agent caught what I couldn't see  `#agentic`
+
+**What happened:** After the cursed-gaps audit, I wrote a learnings
+entry summarising the compiler's "hostile" failure modes. I'd
+already corrected one mistake in this session (reading the runtime
+C without inspecting emitted IR). Codex then reviewed the day's
+commits, ran a verifier script, and caught two further problems:
+my claim that compile errors exit 0 was straight wrong (real
+errors exit 1; only undefined-identifier paths exit 0), and my
+generalisation that `MissingMainCharacter` is a catch-all was
+overstated — only `ready` and `bestie` produce that diagnostic.
+Plus one over-attributed gap blocker in `cursed-gaps.md`.
+
+**Why it's interesting:** Each individual mistake had a "feels
+rigorous" shape — I cited evidence, ran probes, wrote up findings.
+But I generalised from too few data points twice in a row, and a
+verifier covering the full probe matrix made the over-reach
+visible. Self-review caught zero of the three; cross-agent review
+caught all three. Worth keeping in mind when one agent is doing a
+lot of the writing.
+
 ### 2026-05-09 — two CURSED compiler quirks worth knowing  `#cursed` `#agentic`
 
 **What happened:** Two compile-time quirks surfaced during the gaps

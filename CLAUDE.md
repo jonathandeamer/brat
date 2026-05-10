@@ -23,18 +23,13 @@ Most of CURSED's documentation, examples, and reference material is **aspiration
 - **Update `docs/learnings.md` when you're surprised.** The doc has its own "When to update" section — read it. The short version: CURSED limitations, hallucinated syntax, tooling gaps, quotable user remarks. Not for routine green tests or normal commits.
 - **Avoid AI-writing tropes in `learnings.md`.** Read `~/tropes/tropes.md` before writing entries. The biggest offender for this doc is **"this changes everything" grandiosity** — small surprises don't "fundamentally reshape" anything; they're just notes. Also watch for `delve`, `tapestry`, `landscape`, `serves as`, magic adverbs (`quietly`, `deeply`), and the urge to inflate a one-paragraph observation into a thesis. Concrete and small beats sweeping every time.
 - **Attribute agent commits.** Both Claude and Codex may work in this repo. When an agent creates or amends a commit, include its own `Co-authored-by` trailer so later readers can identify who did the work: `Co-authored-by: Claude <noreply@anthropic.com>` for Claude, and `Co-authored-by: Codex <codex@openai.com>` for Codex. Do not add agent attribution to commits you did not create or amend.
-- **Name Claude-only tools when they drove a decision.** Claude has
-  `~/.claude` skills, slash commands, and `~/.claude` hooks; Codex has
-  separate `~/.codex/skills` support, but not Claude's slash commands
-  or hooks. When a Claude-only tool drove a non-trivial decision in
-  this repo, name the tool in the commit body so Codex review can
-  replay the reasoning.
-- **Keep project skills paired across agents.** The project-specific
-  skills `cursed-tdd` and `cross-repo-sync` should exist in both
-  `~/.claude/skills/` and `~/.codex/skills/`. They intentionally
-  duplicate the same checklist text so either agent can replay the
-  same workflow. After editing one copy, update the other and verify
-  with `diff -u`.
+- **Keep agent-specific scaffolding clear.** Project skills
+  `cursed-tdd` and `cross-repo-sync` should match under
+  `~/.claude/skills/` and `~/.codex/skills/`; verify paired edits with
+  `diff -u`. Claude-only slash commands, `~/.claude` hooks, and
+  permission allowlists do not have direct Codex equivalents here. If a
+  Claude-only tool drove a non-trivial decision, name it in the commit
+  body so Codex review can replay the reasoning.
 
 ## Files to keep current
 
@@ -54,11 +49,9 @@ tracking docs in the same session:
 Keep routine implementation notes out of these docs. Update them when a
 future reviewer or agent would otherwise be misled.
 
-**When the trigger is upstream work in `~/cursed`:** the cursed-side
-CLAUDE.md describes the `cross-repo-sync` discipline that lands the
-brat doc updates here. The Claude skill of the same name automates
-the walk; without it, follow the cursed CLAUDE.md `## Cross-Repo Doc
-Sync` section.
+**When the trigger is upstream work in `~/cursed`:** use the paired
+`cross-repo-sync` skill, or follow the cursed CLAUDE.md `## Cross-Repo
+Doc Sync` fallback.
 
 ## Commands
 

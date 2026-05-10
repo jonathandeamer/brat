@@ -86,6 +86,14 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-10 — the subset gatekeeper was unpushed local work  `#workingoncursed` `#contributing` `#agentic`
+
+**What happened:** Setting up the standard fork+remote layout for ~/cursed (origin = my fork, upstream = ghuntley/cursed). Local `zig` was 3 commits ahead, 0 behind upstream. I told the agent to "overwrite the local commits, pulling from remote," meaning take upstream's state. The agent confirmed once and ran `git reset --hard upstream/zig`. The three commits (`test(compiler): add focused llvm subset integration coverage`, `fix(compiler): fail hard outside the supported llvm subset`, `docs: document the current llvm-only compiler subset`) were authored by me on 2026-04-11 and never pushed anywhere. They contained `specs/current_llvm_subset.md`, `test_suite/compiler_subset/`, and `src-zig/supported_subset.zig`: the subset gatekeeper, its test suite, and the source-of-truth doc that brat's `cursed-gaps.md` cites by path.
+
+**Why it's interesting:** Two things at once. (1) The foundation our roadmap is built on was sitting unpushed on one local branch for a month. brat's gaps doc reads as if those files are part of CURSED upstream; they are not. The first PR upstream isn't a phase-1 fix; it's getting that gating + test scaffolding into ghuntley/cursed at all. (2) "Overwrite the local commits, pulling from remote" was self-contradicting: there was nothing to pull (0 behind), only commits to discard. The agent took it as discard-with-confirm rather than flagging the contradiction. A better confirmation would have named the load-bearing files going overboard. Reflog saved it; next time it might not.
+
+**Quote-worthy bit:** "who made those local commits?" — me, a month ago, and never pushed.
+
 ### 2026-05-09 — a second agent caught what I couldn't see  `#agentic`
 
 **What happened:** After the cursed-gaps audit, I wrote a learnings

@@ -14,6 +14,8 @@ Most of CURSED's documentation, examples, and reference material is **aspiration
 
 **Source of truth:** `~/cursed/specs/current_llvm_subset.md` lists what the compiler actually supports today. Read it before writing or editing any `.💀` code, and re-check when something doesn't compile. If a primitive you need isn't in the subset doc, it doesn't exist yet — note the gap in `docs/learnings.md` (see below) rather than inventing syntax.
 
+**Runtime semantics live across two layers.** The C runtime (`~/cursed/src-zig/cursed_runtime.c`) is one layer; the IR the compiler emits is the other. The compiler can inject calls the runtime grep won't show (e.g., a `\n`-spill after every `vibez.spill`). When auditing what a primitive *actually does* — print bytes, exit code, fd written — compile a tiny program, run it, inspect bytes/exit. Don't substitute a source read for execution. See `docs/learnings.md` 2026-05-09 "read the runtime, missed the IR."
+
 ## Workflow
 
 - **Red-green TDD.** Write the failing test first, watch it fail for the right reason, then implement. The discipline is load-bearing here because CURSED's compiler errors are sparse and misleading — a green test is your main signal that the feature works.

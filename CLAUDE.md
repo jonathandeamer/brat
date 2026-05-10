@@ -26,6 +26,11 @@ than inventing syntax.
 - **Specs and plans are point-in-time snapshots.** `docs/superpowers/specs/` and `docs/superpowers/plans/` capture intent at the moment they were written. If implementation diverges, you do **not** need to retroactively update them unless the divergence is materially important to future readers (e.g. a contract other code depends on). Routine drift is fine.
 - **Update `docs/learnings.md` when you're surprised.** The doc has its own "When to update" section — read it. The short version: CURSED limitations, hallucinated syntax, tooling gaps, quotable user remarks. Not for routine green tests or normal commits.
 - **Avoid AI-writing tropes in `learnings.md`.** Read `~/tropes/tropes.md` before writing entries. The biggest offender for this doc is **"this changes everything" grandiosity** — small surprises don't "fundamentally reshape" anything; they're just notes. Also watch for `delve`, `tapestry`, `landscape`, `serves as`, magic adverbs (`quietly`, `deeply`), and the urge to inflate a one-paragraph observation into a thesis. Concrete and small beats sweeping every time.
+- **Prefer unscoped conventional commits.** Use `docs: ...`, `test: ...`,
+  `fix: ...`, or `chore: ...` unless a scope materially helps. The
+  commit hook allows only these scopes: `compiler`, `runtime`,
+  `learnings`, `gaps`, `specs`, and `claude`. Do not invent narrow
+  scopes such as `docs(plans)`.
 - **Attribute agent commits.** Both Claude and Codex may work in this repo. When an agent creates or amends a commit, include its own `Co-authored-by` trailer so later readers can identify who did the work: `Co-authored-by: Claude <noreply@anthropic.com>` for Claude, and `Co-authored-by: Codex <codex@openai.com>` for Codex. Do not add agent attribution to commits you did not create or amend.
 - **Keep agent-specific scaffolding clear.** Project skills
   `cursed-tdd` and `cross-repo-sync` should match under

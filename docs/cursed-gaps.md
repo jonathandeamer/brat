@@ -35,7 +35,7 @@ Each gap has:
 
 ### stderr-write
 
-**Need:** brat writes its `cat:` error messages to stderr.
+**Need:** brat writes its bratism error messages to stderr.
 **Status:** no-surface.
 **Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — only
 `cursed_runtime_spill_string/_int/_float/_bool` exist, all writing
@@ -61,7 +61,7 @@ bytes on stderr (silent no-op for any unknown function call).
 
 **Need:** brat must read the bytes of each file named on the command line.
 **Status:** no-surface.
-**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — no `fopen`, `fread`, `read`, or `open`. `~/cursed/specs/stdlib/dropz.md:59-99` documents `slay read_file(filename tea) ([]byte, tea)`, `read_text_file`, `open`, `open_file`, and `(f *File) read` — none implemented. Probed: `dropz.read_file("foo")` and other module-prefixed calls compile clean and silently no-op (calls into an unloaded module are dropped). Bare `read_file("foo")` compiles cursed-side but clang fails: `error.FunctionNotFound`.
+**Evidence:** `~/cursed/src-zig/cursed_runtime.c:1-42` — no `fopen`, `fread`, `read`, or `open`. `~/cursed/specs/stdlib/dropz.md:59-99` documents `slay read_file(filename tea) ([]byte, tea)`, `read_text_file`, `open`, `open_file`, and `(f *File) read` — none implemented. Probed: `dropz.read_file("foo")` and other module-prefixed calls compile clean and silently no-op (calls into an unloaded module are dropped). Bare `read_file("foo")` reaches LLVM code generation, then `cursed-compiler` exits 1 with `error.FunctionNotFound`.
 **Brat cases blocked:** all 18 cases except no-args (no-args never opens a file).
 **Upstream framing:** "runtime+stdlib: implement `dropz.read_file`" — minimum: a `dropz.read_file(path tea) ([]byte, tea)` that maps to libc `fopen`/`fread`/`fclose` and surfaces errno-shaped errors.
 
@@ -77,7 +77,7 @@ bytes on stderr (silent no-op for any unknown function call).
 
 **Need:** brat needs whichever stdlib module owns file I/O, stderr, and exit (e.g. `dropz`, `main_character`). Today only `vibez` and `stringz` imports load.
 **Status:** silent-no-op.
-**Evidence:** Probed with `yeet "dropz"` followed by `dropz.read_file("x")`: compiles clean, exits 0, no output. The compile log shows `❌ Failed to load module dropz: error.FileNotFound`, but compilation continues and produces a binary that runs as a no-op. Any call against an unloaded module is silently dropped at IR generation. (An earlier audit recorded these as compile-time *rejections*; that was an artifact of a local-only validator since reset away — see `docs/cursed-subset.md`.)
+**Evidence:** Probed with `yeet "dropz"` followed by `dropz.read_file("x")`: compiles clean, exits 0, no output. The compile log reports `Unknown stdlib module: dropz`, then `Method dropz.read_file not found - skipping for core language testing`; compilation continues and produces a binary that runs as a no-op. Any call against an unloaded module is silently dropped at IR generation. (An earlier audit recorded these as compile-time *rejections*; that was an artifact of a local-only validator since reset away — see `docs/cursed-subset.md`.)
 **Brat cases blocked:** all 18 cases (every brat program needs at least one non-`vibez`/`stringz` import — `dropz` for file I/O, plus whichever module owns stderr/exit).
 **Upstream framing:** "compiler: load and expose `dropz` module against the runtime" — coupled to whichever runtime/stdlib gap (file-read, stderr-write, exit-code-control) is being unblocked.
 

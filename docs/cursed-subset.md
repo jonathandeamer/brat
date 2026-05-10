@@ -84,9 +84,9 @@ Most hostile bucket — no error at compile or run; just wrong values.
 
 ### D. Genuinely missing — no surface to call
 
-- File I/O: no `dropz.read_file`, no bare `read_file` (rejected with
-  `error.FunctionNotFound` at link time), no `open`/`read` runtime
-  helpers.
+- File I/O: no `dropz.read_file`, no bare `read_file` (rejected during
+  LLVM code generation with `error.FunctionNotFound`), no `open`/`read`
+  runtime helpers.
 - stderr writes: `vibez.spill_err`, `vibez.ewrite`, etc. silently
   no-op (bucket B catches them).
 - Process exit codes: `os.exit`, `vibez.exit` silently no-op. Return

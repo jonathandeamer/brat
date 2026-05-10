@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code and Codex when working in this repository.
 
 ## What this is
 
@@ -12,7 +12,11 @@ The aesthetic is **gen-z-coded**, matching CURSED itself: lowercase, terse, slan
 
 Most of CURSED's documentation, examples, and reference material is **aspirational design docs, not implemented behavior**. Do not trust syntax you "remember" — the language is too young and too thinly trained-on to guess at.
 
-**Source of truth (brat-local):** `docs/cursed-subset.md` and `experiments/verify_cursed_gaps.sh`. The subset doc is a four-bucket classification of what the upstream `cursed-compiler --compile` accepts/runs today, captured against `ghuntley/cursed` `zig` HEAD. The verifier is the runnable probe set — re-run when in doubt or when upstream moves. Read these before writing or editing any `.💀` code, and re-check when something doesn't compile. If a primitive you need isn't usable per these, note the gap in `docs/cursed-gaps.md`, track upstream issue/PR status in `UPSTREAM.md`, and surface anything genuinely surprising in `docs/learnings.md` rather than inventing syntax. Upstream has no published subset doc — the local files in this repo are the only such doc that exists.
+**Source of truth (brat-local):** `docs/cursed-subset.md` and
+`experiments/verify_cursed_gaps.sh`. Read these before writing or
+editing `.💀` code, and re-check when something does not compile. If a
+primitive is not usable, update the relevant tracking docs below rather
+than inventing syntax.
 
 **Runtime semantics live across two layers.** The C runtime (`~/cursed/src-zig/cursed_runtime.c`) is one layer; the IR the compiler emits is the other. The compiler can inject calls the runtime grep won't show (e.g., a `\n`-spill after every `vibez.spill`). When auditing what a primitive *actually does* — print bytes, exit code, fd written — compile a tiny program, run it, inspect bytes/exit. Don't substitute a source read for execution. See `docs/learnings.md` 2026-05-09 "read the runtime, missed the IR."
 
@@ -31,7 +35,7 @@ Most of CURSED's documentation, examples, and reference material is **aspiration
   Claude-only tool drove a non-trivial decision, name it in the commit
   body so Codex review can replay the reasoning.
 
-## Files to keep current
+## Tracking Docs
 
 When work changes the relationship between brat and CURSED, update the
 tracking docs in the same session:
@@ -40,7 +44,7 @@ tracking docs in the same session:
 - `UPSTREAM.md` — CURSED issues, PRs, links, status, and which brat gap
   they address.
 - `docs/cursed-subset.md` — verified current behavior of
-  `cursed-compiler --compile`.
+  `cursed-compiler --compile`; upstream has no published equivalent.
 - `docs/cursed-gaps.md` — brat blockers, failure modes, blocked cases,
   and upstream framing.
 - `docs/learnings.md` — durable surprises only, using the tag guidance

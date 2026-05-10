@@ -1,10 +1,13 @@
 # What I Learned Building brat
 
 A running journal of observations from building brat (a cat-clone in
-CURSED). Fodder for a possible later blog post along three axes:
+CURSED). Fodder for a possible later blog post along four axes:
 
-- `#cursed` — writing in an unusual language.
-- `#contributing` — contributing back to a young language.
+- `#brat` — brat product, design, tests, and user-facing behavior.
+- `#brat-on-cursed` — brat work that probes, depends on, or documents
+  current CURSED behavior.
+- `#cursed-dev` — direct work in `~/cursed` on CURSED itself:
+  compiler, runtime, tests, fork setup, and upstreamable fixes.
 - `#agentic` — coding-with-an-agent in a thin-training-data language.
 
 Newest entries first.
@@ -18,13 +21,17 @@ worth remembering happens during a session.
 
 Consider an entry when any of these happen:
 
-- A CURSED limitation, bug, or missing primitive surfaces. `#cursed`
+- A brat design, test, or behavior decision is worth remembering. `#brat`
+- brat work exposes a CURSED limitation, bug, or missing primitive.
+  `#brat-on-cursed`
 - An upstream issue, PR, or feature request gets filed against
-  CURSED. Capture what motivated it. `#contributing`
+  CURSED, or we make direct changes in `~/cursed`. Capture what
+  motivated it. `#cursed-dev`
 - You invent plausible-looking CURSED syntax that turns out not to
   exist, or catch yourself about to. The hallucination shape is the
   interesting part. `#agentic`
-- A scope or design decision turns on the language's quirks. `#cursed`
+- A scope or design decision turns on the language's quirks.
+  `#brat-on-cursed`
 - Tooling and docs gaps bite (sparse search results, no LSP,
   compiler errors that mislead). `#agentic`
 - The user says something quote-worthy.
@@ -43,7 +50,8 @@ is gone.
 - Append, don't rewrite. Existing entries are primary sources. Do
   not normalize, tidy, or edit them.
 - Use the entry template below. Skip any heading that doesn't apply.
-- Tag with one or more of `#cursed`, `#contributing`, `#agentic`.
+- Tag with one or more of `#brat`, `#brat-on-cursed`, `#cursed-dev`,
+  `#agentic`.
 - First person is fine.
 - `## Running Themes` is mostly human territory. You may add to it
   only when the same pattern shows up in three or more existing log
@@ -120,7 +128,7 @@ create `/home/ghuntley` as a real directory and symlink only
 
 **Quote-worthy bit:** `sudo ln -s /home/ec2-user /home/ghuntley`
 
-### 2026-05-10 — a sibling-repo loop left fingerprints in my audit  `#agentic` `#cursed`
+### 2026-05-10 — a sibling-repo loop left fingerprints in my audit  `#agentic` `#brat-on-cursed` `#cursed-dev`
 
 **What happened:** The local-only commits that anchored the
 original brat audit (`specs/current_llvm_subset.md`,
@@ -152,7 +160,7 @@ able from upstream documentation. Worth a check before treating
 a sibling repo's specs as authoritative: `git log @{u}.. <file>`
 or `git diff @{u}` to see if the file is local-only.
 
-### 2026-05-10 — the gated picture wasn't the upstream picture  `#cursed` `#agentic`
+### 2026-05-10 — the gated picture wasn't the upstream picture  `#brat-on-cursed` `#agentic`
 
 **What happened:** The original cursed-gaps audit ran against a
 local CURSED checkout that had three unpushed commits adding a
@@ -185,7 +193,7 @@ it looks like it does.
 0 variables, 0 calls` (the compile log for a function whose only
 sin was containing a `ready`).
 
-### 2026-05-10 — the subset gatekeeper was unpushed local work  `#workingoncursed` `#contributing` `#agentic`
+### 2026-05-10 — the subset gatekeeper was unpushed local work  `#cursed-dev` `#agentic`
 
 **What happened:** Setting up the standard fork+remote layout for ~/cursed (origin = my fork, upstream = ghuntley/cursed). Local `zig` was 3 commits ahead, 0 behind upstream. I told the agent to "overwrite the local commits, pulling from remote," meaning take upstream's state. The agent confirmed once and ran `git reset --hard upstream/zig`. The three commits (`test(compiler): add focused llvm subset integration coverage`, `fix(compiler): fail hard outside the supported llvm subset`, `docs: document the current llvm-only compiler subset`) were authored by me on 2026-04-11 and never pushed anywhere. They contained `specs/current_llvm_subset.md`, `test_suite/compiler_subset/`, and `src-zig/supported_subset.zig`: the subset gatekeeper, its test suite, and the source-of-truth doc that brat's `cursed-gaps.md` cites by path.
 
@@ -214,7 +222,7 @@ visible. Self-review caught zero of the three; cross-agent review
 caught all three. Worth keeping in mind when one agent is doing a
 lot of the writing.
 
-### 2026-05-09 — two CURSED compiler quirks worth knowing  `#cursed` `#agentic`
+### 2026-05-09 — two CURSED compiler quirks worth knowing  `#brat-on-cursed` `#agentic`
 
 **What happened:** Two compile-time quirks surfaced during the gaps
 audit. (An earlier draft of this entry claimed three; a code review
@@ -247,7 +255,7 @@ worth recognising the pattern when grepping CURSED's diagnostics.
 
 **Quote-worthy bit:** "Variable argv not found, returning 0."
 
-### 2026-05-09 — read the runtime, missed the IR  `#agentic` `#cursed`
+### 2026-05-09 — read the runtime, missed the IR  `#agentic` `#brat-on-cursed`
 
 **What happened:** During the cursed-gaps audit I claimed `vibez.spill`
 does *not* append `\n`, contradicting the brat-design spec. The
@@ -275,7 +283,7 @@ the right probe is the binary's stdout.
 
 **Quote-worthy bit:** I would have caught this with `xxd`.
 
-### 2026-05-09 — cursed-gaps audit  `#cursed` `#contributing`
+### 2026-05-09 — cursed-gaps audit  `#brat-on-cursed`
 
 **What happened:** Walked all 18 brat test cases and mapped each to
 the CURSED primitives an implementation would need. Wrote them up in
@@ -299,7 +307,7 @@ would be.
 
 **Quote-worthy bit:** `Variable argv not found, returning 0`.
 
-### 2026-05-09 — `make test` is one script and a graveyard  `#cursed` `#agentic`
+### 2026-05-09 — `make test` is one script and a graveyard  `#cursed-dev` `#agentic`
 
 **What happened:** Ran `make test` in `~/cursed/` to see what the
 project considers "passing." It builds the compiler and runs
@@ -316,7 +324,7 @@ of abandoned attempts — and the file names (`final_*`, `complete_*`,
 agent looking for evidence of what works, the loose files are
 actively misleading: they look like tests but assert nothing.
 
-### 2026-05-09 — the implemented subset is a lot smaller than the surface  `#cursed` `#agentic`
+### 2026-05-09 — the implemented subset is a lot smaller than the surface  `#brat-on-cursed` `#agentic`
 
 **What happened:** Before writing the first red test, I checked what
 CURSED actually compiles today. `~/cursed/` ships hundreds of `.💀`
@@ -351,7 +359,7 @@ fuss online that this is an entire new language?" The honest answer
 is that the language is real and the implementation is one `printf`
 and four string ops.
 
-### 2026-05-09 — bratism as error-message constraint  `#cursed`
+### 2026-05-09 — bratism as error-message constraint  `#brat`
 
 **What happened:** The error message for "no files given" is
 specified in the design as `bestie you have to give me a file`,
@@ -379,7 +387,7 @@ fixing the plan. The revert is the lesson, not the symlink.
 **Quote-worthy bit:** the commit message says it plainly:
 `fix(plan): use python3 instead of python; revert unauthorized symlink`.
 
-### 2026-05-09 — golden ambiguities  `#cursed` `#agentic`
+### 2026-05-09 — golden ambiguities  `#brat` `#agentic`
 
 **What happened:** A TDD addendum to the spec pinned six behaviors
 the original spec didn't pin (commit `7464a44`). Things like exact
@@ -392,7 +400,7 @@ wall. The addendum names them "golden ambiguities," which is a
 useful frame: ambiguities you've decided to freeze in place via
 tests rather than resolve in prose.
 
-### 2026-05-09 — scope as aesthetic  `#cursed`
+### 2026-05-09 — scope as aesthetic  `#brat`
 
 **What happened:** The v1.0 spec rules out flags entirely. No `-n`,
 no `--help`, no `--version`. No stdin. No `NO_COLOR`. No paging.
@@ -406,7 +414,7 @@ why the cuts feel easy instead of painful.
 **Quote-worthy bit:** from the design: "No flags. brat doesn't
 speak."
 
-### 2026-05-09 — why CURSED at all  `#cursed` `#contributing`
+### 2026-05-09 — why CURSED at all  `#brat` `#brat-on-cursed`
 
 **What happened:** The project pitch is the combination, not any
 single layer: a working Unix utility, written in CURSED, that

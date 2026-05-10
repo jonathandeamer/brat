@@ -86,6 +86,30 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-09 — cursed-gaps audit  `#cursed` `#contributing`
+
+**What happened:** Walked all 18 brat test cases and mapped each to
+the CURSED primitives an implementation would need. Wrote them up in
+`docs/cursed-gaps.md`. 14 distinct gaps surfaced. Seven of them block
+every case (non-stdlib-imports, user-defined-functions, member-access,
+array-literals-and-indexing, conditionals, argv-access,
+binary-expressions); the rest are case-specific (errno-surfacing for
+the four error paths, raw-stdout-write for `binary-nul` only, loops +
+assignment for the header-padding loop).
+
+**Why it's interesting:** The 18 cases were chosen for behavioural
+coverage, not primitive coverage, but the audit collapsed to a tight
+core. Most of brat's test matrix asks for the same seven things. The
+two surprises were on the edges: `vibez.spill` actually does *not*
+append `\n` (the brat design spec was wrong about this — runtime is
+`printf("%s", ...)`), so `raw-stdout-write` is narrower than expected
+and only `binary-nul` needs it. And `argv` as a bare identifier
+compiles cleanly with the warning `Variable argv not found, returning
+0` — the silent-zero failure mode is worse than a hard rejection
+would be.
+
+**Quote-worthy bit:** `Variable argv not found, returning 0`.
+
 ### 2026-05-09 — `make test` is one script and a graveyard  `#cursed` `#agentic`
 
 **What happened:** Ran `make test` in `~/cursed/` to see what the

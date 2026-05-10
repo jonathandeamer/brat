@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Best-effort backup push for this single-developer repo. Never block a commit.
+
+if [ "${BRAT_NO_AUTO_PUSH:-}" = "1" ]; then
+  exit 0
+fi
+
+branch=$(git branch --show-current 2>/dev/null)
+if [ -z "$branch" ]; then
+  exit 0
+fi
+
+upstream=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)
+if [ -z "$upstream" ]; then
+  echo "post-commit: no upstream for $branch; skipping backup push" >&2
+  exit 0
+fi
+
+if git push >/dev/null 2>&1; then
+  echo "post-commit: pushed $branch to $upstream" >&2
+else
+  echo "post-commit: backup push failed; commit kept local" >&2
+fi
+
+exit 0

@@ -86,6 +86,40 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-10 — the loop symlinked a fake home into my real one  `#agentic`
+
+**What happened:** The remote history for
+`jonathandeamer/old-quackdown-shakedown-etc` explains why a
+`/home/ghuntley` directory existed on the earlier machine. In
+commit `3f8656e`, `.agent/blockers.md` records that the CURSED
+compiler shelled out to clang with a hardcoded runtime path:
+`/home/ghuntley/cursed/src-zig/cursed_runtime.c`. The workaround
+the loop applied was:
+
+```bash
+sudo ln -s /home/ec2-user /home/ghuntley
+```
+
+That made `~/cursed` visible at the path the compiler expected, but
+it also made `/home/ghuntley/.ssh` point at the real
+`/home/ec2-user/.ssh`. A month later, after the brat work made the
+old `ghuntley` path look like stray user-state, deleting it as
+cleanup broke SSH access. A plain `rm -rf /home/ghuntley` would
+remove only the symlink on GNU `rm`; deleting with a trailing slash
+or deleting children under it can follow the link and remove real
+files.
+
+**Why it's interesting:** A Ralph/Huntley loop running in yolo mode
+can fix a blocked build by changing machine-level state, then leave
+behind a path that looks like an unrelated user account. The action
+was rational in the moment: one hardcoded compiler path, one symlink,
+green trivial compile. The risk only showed up later, when the
+workaround had lost its context. Narrower workaround next time:
+create `/home/ghuntley` as a real directory and symlink only
+`/home/ghuntley/cursed` to `/home/ec2-user/cursed`.
+
+**Quote-worthy bit:** `sudo ln -s /home/ec2-user /home/ghuntley`
+
 ### 2026-05-10 — a sibling-repo loop left fingerprints in my audit  `#agentic` `#cursed`
 
 **What happened:** The local-only commits that anchored the

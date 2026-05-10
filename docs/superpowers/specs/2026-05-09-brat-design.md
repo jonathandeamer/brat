@@ -67,9 +67,9 @@ There is no flag-parsing function; argv minus arg 0 is the filename list.
 
 ### Why `io.write` and not `vibez.spill`
 
-`vibez.spill` is line-oriented and always appends `\n`. Using it for file contents would (a) add a trailing newline to files that don't end in one, breaking `cat`-style verbatim semantics, and (b) double the trailing newline on files that do. brat needs a byte-oriented stdout primitive (`io.write`) that emits exactly the bytes given, no more. This is part of PR-4's scope (see Section 6).
+`vibez.spill` is implemented as `printf("%s", str)` (see `~/cursed/src-zig/cursed_runtime.c:7-11`) — it does not append `\n`, but `%s` truncates at the first NUL byte. That's fine for text files but breaks `cat`-style verbatim semantics on binary input (the `binary-nul` test case is the canary). brat needs a `(ptr, len)`-shaped stdout primitive (`io.write`) that emits exactly the bytes given, NUL-safe. This is part of PR-4's scope (see Section 6).
 
-`vibez.spill` is still fine for places where we *do* want an implicit newline — e.g., terminating block-header lines — but the spec uses `io.write` for both header and body to keep newline behavior explicit and predictable.
+For non-NUL output (UTF-8, embedded `\n`, no-trailing-newline files) `vibez.spill` already does the right thing; the spec uses `io.write` uniformly to keep one I/O surface across header and body and to handle the binary case, not because newline behavior differs.
 
 ### Graceful degradation
 
@@ -192,7 +192,7 @@ Estimated effort: 2–3 evenings.
 **PR-4 (now critical-path): `io.write` / `io.eprintln` — raw byte I/O**
 brat needs three I/O primitives beyond the line-oriented `vibez.spill`:
 
-- `io.write(s tea)` — write raw bytes to stdout, no implicit newline. **Critical.** Required to print file contents byte-perfectly (`vibez.spill` always appends `\n` and so cannot match `cat`-style verbatim semantics).
+- `io.write(s tea)` — write raw bytes to stdout, NUL-safe (takes a length, not a C string). **Critical.** Required to print binary file contents byte-perfectly. `vibez.spill` is `printf("%s", ...)` (no newline appended, contrary to what an earlier draft of this spec claimed) and works for non-NUL output, but truncates at the first NUL byte — so it can't carry the `binary-nul` case.
 - `io.ewrite(s tea)` — same but to stderr.
 - `io.eprintln(s tea)` — convenience wrapper around `io.ewrite` that adds `\n`. Used for error messages.
 

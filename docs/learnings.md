@@ -86,31 +86,36 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
-### 2026-05-09 — the compiler is quiet in three hostile ways  `#cursed` `#agentic`
+### 2026-05-09 — two CURSED compiler quirks worth knowing  `#cursed` `#agentic`
 
-**What happened:** Three failure modes surfaced during the gaps
-audit, all sharing a shape: the compiler degrades silently instead
-of erroring.
+**What happened:** Two compile-time quirks surfaced during the gaps
+audit. (An earlier draft of this entry claimed three; a code review
+caught that one of them was wrong — real compile errors do exit 1,
+the silent-success failure is the undefined-identifier path, not
+compile errors generally.)
 
-1. **Compile errors exit 0.** The `ready` probe printed
-   `error: MissingMainCharacter` and `$?` was 0. CI scripts that
-   gate on exit code would pass a broken build.
-2. **Undefined identifiers compile to `i64 0`.** `vibez.spill(argv)`
-   lowered to `cursed_runtime_spill_int(i64 0)` and ran clean. The
-   "Variable argv not found, returning 0" message is a debug
-   stderr line, not an error.
-3. **`MissingMainCharacter` is a catch-all.** Any unsupported
-   construct in a function body — `ready`, `bestie`, etc. — drops
-   that function from the validator's set, then the entry-point
-   check fails with this same diagnostic. The diagnostic doesn't
-   name the offending construct.
+1. **Undefined identifiers compile clean.** `vibez.spill(argv)`
+   lowered to `cursed_runtime_spill_int(i64 0)`, exited 0, and ran
+   to "0\n". The "Variable argv not found, returning 0" message is
+   a debug stderr line, not an error. Any program that reads an
+   identifier the compiler doesn't recognise will silently
+   substitute integer 0 with no signal at compile or run time.
+2. **`ready` and `bestie` produce a misleading diagnostic.**
+   Programs containing either keyword in a function body fail with
+   `error: MissingMainCharacter` even when `slay main_character()`
+   is on the page. The validator drops the offending function from
+   its set, then the entry-point check fails. Other unsupported
+   constructs (member access, array literals, binary expressions,
+   assignment, user calls) return specific `UnsupportedConstruct`
+   diagnostics that name the construct — so this catch-all is
+   narrow, just `ready` and `bestie`.
 
-**Why it's interesting:** Future probes that "look fine" need a
-second look. A clean exit, a successful compile, or a diagnostic
-that mentions an unrelated thing aren't reliable negative signals.
-The runtime-execution rule from the prior entry catches case 2;
-cases 1 and 3 want script-level paranoia (`grep -i error` on
-combined stdout+stderr, not just `$?`).
+**Why it's interesting:** Both quirks make probes harder to read.
+For (1), a clean compile and a clean run can both lie — the
+runtime-execution rule from the prior entry is what catches it.
+For (2), the diagnostic mentions an unrelated thing, so a probe
+author looking up "MissingMainCharacter" sees the wrong concept;
+worth recognising the pattern when grepping CURSED's diagnostics.
 
 **Quote-worthy bit:** "Variable argv not found, returning 0."
 

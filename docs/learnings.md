@@ -86,6 +86,39 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-10 — the gated picture wasn't the upstream picture  `#cursed` `#agentic`
+
+**What happened:** The original cursed-gaps audit ran against a
+local CURSED checkout that had three unpushed commits adding a
+subset validator, the `current_llvm_subset.md` doc, and a test
+fixture suite. Those commits got reset away (see entry below). I
+rebuilt the compiler against clean upstream and re-ran the
+verifier script. Most of the "compile-time rejection" gaps weren't
+gaps at all in upstream: argless void user-defined functions
+work, integer arithmetic works, assignment works, non-stdlib
+imports compile clean. What I found in their place was a more
+hostile pattern: the compiler accepts these constructs and
+*silently miscompiles* them. `ready` and `bestie` cause the whole
+enclosing function to disappear from the captured-calls list; array
+indexing always emits `spill_int(i64 1)` regardless of array or
+index; UDF arguments lower to integer 0; member access produces
+broken IR that clang refuses. Net for brat: 12 gaps where there
+were 14, but with worse failure modes for most of them.
+
+**Why it's interesting:** A validator that cleanly rejects
+unsupported constructs is friendlier to write against than a
+permissive parser that lets them through and miscompiles them.
+The local gating layer existed for a good reason. The CLAUDE.md
+rule about runtime-execution probes (added after the `vibez.spill`
+IR finding) covers more than just stdout semantics — it applies to
+every primitive in this codebase, since "compiles cleanly" tells
+you almost nothing about whether the program will actually do what
+it looks like it does.
+
+**Quote-worthy bit:** `Generated dynamic LLVM IR with 0 strings,
+0 variables, 0 calls` (the compile log for a function whose only
+sin was containing a `ready`).
+
 ### 2026-05-10 — the subset gatekeeper was unpushed local work  `#workingoncursed` `#contributing` `#agentic`
 
 **What happened:** Setting up the standard fork+remote layout for ~/cursed (origin = my fork, upstream = ghuntley/cursed). Local `zig` was 3 commits ahead, 0 behind upstream. I told the agent to "overwrite the local commits, pulling from remote," meaning take upstream's state. The agent confirmed once and ran `git reset --hard upstream/zig`. The three commits (`test(compiler): add focused llvm subset integration coverage`, `fix(compiler): fail hard outside the supported llvm subset`, `docs: document the current llvm-only compiler subset`) were authored by me on 2026-04-11 and never pushed anywhere. They contained `specs/current_llvm_subset.md`, `test_suite/compiler_subset/`, and `src-zig/supported_subset.zig`: the subset gatekeeper, its test suite, and the source-of-truth doc that brat's `cursed-gaps.md` cites by path.

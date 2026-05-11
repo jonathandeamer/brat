@@ -1,10 +1,11 @@
 # CURSED Gaps for brat
 
 A per-primitive roadmap of what CURSED is missing for brat to be
-implementable. Captured as of 2026-05-10 against clean upstream
-`ghuntley/cursed` (`zig` branch, HEAD = `ecda33d49`). Diagnostics
-and IR shapes will drift; this doc is a snapshot, not a live
-contract.
+implementable. Updated as of 2026-05-11 against local `~/cursed`
+`main`: clean upstream `ghuntley/cursed` (`zig` branch, HEAD =
+`ecda33d49`) plus runtime-path portability commits `2fa866746` and
+`7dafe251c`. Diagnostics and IR shapes will drift; this doc is a
+snapshot, not a live contract.
 
 ## Companion docs
 
@@ -23,7 +24,8 @@ Each gap has:
   - `no-surface` — runtime/stdlib doesn't expose what brat needs
   - `silent-no-op` — call compiles but does nothing at runtime
   - `silent-miscompile` — compiles + runs but produces wrong output
-  - `broken-IR` — cursed-compiler exits 0; clang fails to link
+  - `broken-IR` — cursed-compiler reaches clang, but generated IR
+    fails to link
   - `partial` — some shapes work, others fail in one of the modes above
 - **Evidence:** runtime-C / spec citation, fenced probe output, or
   reference to a `verify_cursed_gaps.sh` probe — at least one.
@@ -93,7 +95,7 @@ bytes on stderr (silent no-op for any unknown function call).
 
 **Need:** brat's design spec uses method-call / selector syntax extensively (`io.write`, `os.argv`, `state.ExitCode()`); even simple field reads like `result.err` are out of reach.
 **Status:** broken-IR.
-**Evidence:** Probe `sus s tea = "hello"; vibez.spill(s.length)`: cursed-compiler reports success but emits IR with an undefined string reference, and clang fails with `error: use of undefined value '@.str.0'`. No binary is produced; runtime `$? = 127` because the binary file the wrapper looks for doesn't exist. Stdlib calls like `vibez.spill` are recognised as a special-cased form (parsed as a call to the runtime helper directly), not as general member access.
+**Evidence:** Probe `sus s tea = "hello"; vibez.spill(s.length)`: cursed-compiler emits IR with an undefined string reference, clang fails with `error: use of undefined value '@.str.0'`, and the compiler exits 1 with `error.ClangFailed`. No binary is produced. Stdlib calls like `vibez.spill` are recognised as a special-cased form (parsed as a call to the runtime helper directly), not as general member access.
 **Brat cases blocked:** all 18 cases (the design uses `os.argv`, `state.ExitCode()`, and `result.err`-shaped reads throughout; even the no-args branch needs `os.argv` length).
 **Upstream framing:** "compiler: implement general selector / member-access lowering" — minimum: `expr.field` and `expr.method(args)` for user types and stdlib values, not just hard-coded `module.fn` patterns.
 

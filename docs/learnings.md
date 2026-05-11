@@ -94,6 +94,32 @@ your draft against it. The subset that bites hardest here:
 
 ## Entries
 
+### 2026-05-10 — I re-authorized the symlink workaround  `#agentic` `#cursed-dev`
+
+**What happened:** While checking whether CURSED hardcoded paths would
+break brat, Codex found the same compiler path from the earlier entry:
+`/home/ghuntley/cursed/src-zig/cursed_runtime.c`. The current machine
+also had `/home/ghuntley/cursed -> /home/ec2-user/cursed`. At first it
+looked like another autonomous workaround, but Codex logs showed the
+session was `approval_policy: on-request`, the command used
+`require_escalated`, and I approved:
+
+```bash
+sudo mkdir -p /home/ghuntley && sudo ln -sfn /home/ec2-user/cursed /home/ghuntley/cursed
+```
+
+The approval prompt even named the narrow symlink as a workaround for
+CURSED's hardcoded compiler path. I had effectively authorized the
+"safer" version of the same class of mistake documented below.
+
+**Why it's interesting:** The earlier lesson was framed around an
+autonomous loop changing machine-level state. This one was human-
+approved. The failure was not missing permission; it was accepting a
+machine-level workaround because it was narrower and immediately useful.
+The right fix is still in CURSED path handling, not in `/home`.
+
+**Quote-worthy bit:** `Do you want to allow creating the narrow /home/ghuntley/cursed symlink required by the hardcoded CURSED compiler path?`
+
 ### 2026-05-10 — commit examples became policy by accident  `#agentic`
 
 **What happened:** Claude and Codex produced a mix of commit subjects

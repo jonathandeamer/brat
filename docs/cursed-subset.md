@@ -1,9 +1,11 @@
-# Cursed compile subset (clean upstream, 2026-05-10)
+# Cursed compile subset (local cursed main, 2026-05-11)
 
 A brat-local note recording what `cursed-compiler --compile` actually
-does today against clean upstream `ghuntley/cursed` (`zig` branch,
-HEAD = `ecda33d49`). Companion to `docs/cursed-gaps.md`, which
-identifies the primitives brat needs that aren't reachable here.
+does today against local `~/cursed` `main`. This is clean upstream
+`ghuntley/cursed` (`zig` branch, HEAD = `ecda33d49`) plus the
+runtime-path portability fix in `~/cursed` commits `2fa866746` and
+`7dafe251c`. Companion to `docs/cursed-gaps.md`, which identifies the
+primitives brat needs that aren't reachable here.
 
 ## Why this doc exists
 
@@ -32,9 +34,11 @@ bash experiments/verify_cursed_gaps.sh
 
 ## Failure-mode taxonomy
 
-The clean-upstream compiler doesn't reject much. Almost everything
-"compiles" (exit 0). But many compiled programs misbehave at runtime
-in distinct ways, falling into four buckets:
+The compiler doesn't reject much. Almost everything "compiles" (exit
+0). But many compiled programs misbehave at runtime in distinct ways,
+falling into four buckets. Since `~/cursed` commit `7dafe251c`, clang
+link failures now propagate as compiler exit 1 instead of reporting
+success with no binary.
 
 ### A. Compiles + runs correctly
 
@@ -77,10 +81,9 @@ Most hostile bucket — no error at compile or run; just wrong values.
 ### C. Compiles cursed-side, fails at clang/link
 
 - Member access — `s.length` on a `tea` value emits IR with an
-  undefined `@.str.0` reference; cursed-compiler reports success
-  but clang fails: `error: use of undefined value '@.str.0'`. No
-  binary produced; runtime exit is 127 ("file not found") because
-  the wrapper looks for an executable that was never written.
+  undefined `@.str.0` reference; clang fails with
+  `error: use of undefined value '@.str.0'`, and cursed-compiler now
+  exits 1 with `error.ClangFailed`. No binary is produced.
 
 ### D. Genuinely missing — no surface to call
 

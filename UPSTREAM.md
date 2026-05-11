@@ -36,7 +36,7 @@ bash experiments/verify_cursed_gaps.sh
 | stderr write | Printing bratism errors separately from stdout | `docs/cursed-gaps.md#stderr-write` | Not filed | Not filed | Open |
 | exit-code control | Returning non-zero when any file fails | `docs/cursed-gaps.md#exit-code-control` | Not filed | Not filed | Open |
 | raw stdout write | Emitting file bytes verbatim without implicit newline or NUL truncation | `docs/cursed-gaps.md#raw-stdout-write` | Not filed | Not filed | Open |
-| native compile runtime path portability | Running `cursed-compiler --compile` from a checkout that is not `/home/ghuntley/cursed` | `docs/learnings.md#2026-05-10--i-re-authorized-the-symlink-workaround` | Not filed | Local branch `fix-runtime-path-upstream` | Local fix |
+| native compile runtime path portability | Running `cursed-compiler --compile` from a checkout that is not `/home/ghuntley/cursed` | `docs/learnings.md#2026-05-10--i-re-authorized-the-symlink-workaround` | [#14](https://github.com/ghuntley/cursed/issues/14) | [#15](https://github.com/ghuntley/cursed/pull/15) | PR open |
 | non-`vibez` / `stringz` stdlib imports | Reaching whichever modules provide file I/O, stderr, and exit | `docs/cursed-gaps.md#non-stdlib-imports` | Not filed | Not filed | Open |
 | user-defined function parameters and returns | Factoring header and error-message helpers out of `main_character` | `docs/cursed-gaps.md#user-defined-functions` | Not filed | Not filed | Open |
 | member access / selector lowering | Calling stdlib-style APIs and reading result fields | `docs/cursed-gaps.md#member-access` | Not filed | Not filed | Open |

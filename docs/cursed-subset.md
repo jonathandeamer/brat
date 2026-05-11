@@ -1,11 +1,11 @@
-# Cursed compile subset (local cursed main, 2026-05-11)
+# Cursed compile subset (local cursed `fix-runtime-path-upstream`, 2026-05-11)
 
 A brat-local note recording what `cursed-compiler --compile` actually
-does today against local `~/cursed` `main`. This is clean upstream
-`ghuntley/cursed` (`zig` branch, HEAD = `ecda33d49`) plus the
-runtime-path portability fix in `~/cursed` commits `2fa866746` and
-`7dafe251c`. Companion to `docs/cursed-gaps.md`, which identifies the
-primitives brat needs that aren't reachable here.
+does today against local `~/cursed` branch `fix-runtime-path-upstream`
+(`1917fbc26`). This is clean upstream `ghuntley/cursed` (`zig` branch,
+HEAD = `ecda33d49`) plus the four commits now proposed upstream in
+issue `#14` / PR `#15`. Companion to `docs/cursed-gaps.md`, which
+identifies the primitives brat needs that aren't reachable here.
 
 ## Why this doc exists
 
@@ -36,7 +36,7 @@ bash experiments/verify_cursed_gaps.sh
 
 The compiler doesn't reject much. Almost everything "compiles" (exit
 0). But many compiled programs misbehave at runtime in distinct ways,
-falling into four buckets. Since `~/cursed` commit `7dafe251c`, clang
+falling into four buckets. Since `~/cursed` commit `1917fbc26`, clang
 link failures now propagate as compiler exit 1 instead of reporting
 success with no binary.
 

@@ -2,10 +2,10 @@
 
 A per-primitive roadmap of what CURSED is missing for brat to be
 implementable. Updated as of 2026-05-11 against local `~/cursed`
-`main`: clean upstream `ghuntley/cursed` (`zig` branch, HEAD =
-`ecda33d49`) plus runtime-path portability commits `2fa866746` and
-`7dafe251c`. Diagnostics and IR shapes will drift; this doc is a
-snapshot, not a live contract.
+branch `fix-runtime-path-upstream` (`1917fbc26`): clean upstream
+`ghuntley/cursed` (`zig` branch, HEAD = `ecda33d49`) plus the four
+commits now proposed upstream in issue `#14` / PR `#15`. Diagnostics
+and IR shapes will drift; this doc is a snapshot, not a live contract.
 
 ## Companion docs
 
